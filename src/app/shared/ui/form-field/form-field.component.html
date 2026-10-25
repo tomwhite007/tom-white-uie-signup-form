@@ -1,0 +1,23 @@
+<div class="flex flex-col gap-1.5">
+  <label
+    [for]="id()"
+    class="text-text-heading inline-flex items-center gap-1 text-sm font-medium"
+  >
+    <span>{{ label() }}</span>
+    @if (required()) {
+      <span class="text-status-error font-semibold" aria-hidden="true">*</span>
+    }
+  </label>
+
+  @if (helperText()) {
+    <p [id]="helperId()" class="text-text-muted text-xs">
+      {{ helperText() }}
+    </p>
+  }
+
+  <ng-content />
+
+  @if (errorMessage(); as message) {
+    <app-field-error [id]="errorId()" [message]="message" />
+  }
+</div>

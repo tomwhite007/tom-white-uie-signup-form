@@ -1,0 +1,23 @@
+<button
+  [type]="type()"
+  [disabled]="isDisabled()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  class="ds-focus-ring inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-base font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+  [class.w-full]="fullWidth()"
+  [class.bg-brand-primary]="variant() === 'primary'"
+  [class.text-text-on-brand]="variant() === 'primary'"
+  [class.hover:bg-brand-primary-hover]="variant() === 'primary' && !isDisabled()"
+  [class.active:bg-brand-primary-active]="variant() === 'primary' && !isDisabled()"
+  [class.bg-surface-card]="variant() === 'secondary'"
+  [class.text-text-heading]="variant() === 'secondary'"
+  [class.border]="variant() === 'secondary'"
+  [class.border-border-default]="variant() === 'secondary'"
+  [class.hover:bg-surface-muted]="variant() === 'secondary' && !isDisabled()"
+>
+  @if (loading()) {
+    <app-spinner size="md" />
+  }
+  <span>
+    <ng-content />
+  </span>
+</button>
