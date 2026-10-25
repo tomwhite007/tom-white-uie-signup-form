@@ -171,3 +171,5 @@ Tokens are intentionally prefixed by their semantic category (`text-*`, `surface
 - `npm run lint`: Run ESLint across `src/`
 - `npm test`: Execute unit and integration test suite via Vitest
 - `npm run test:e2e`: Execute Playwright end-to-end and `@axe-core/playwright` accessibility suite
+- `npm run test:e2e:ui`: Launch interactive Playwright UI Mode for visual step-by-step test inspection
+- `npm run test:e2e:headed`: Run Playwright E2E suite in a visible browser window
