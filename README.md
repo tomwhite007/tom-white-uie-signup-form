@@ -122,7 +122,14 @@ Rather than scattering form state across component classes, the Signal Form inst
 - **Encapsulated Submission Pipeline**: The internal `rxMethod<SignUpPayload>` stream is kept private inside `withMethods`, exposing only `submitForm()` and `reset()`. Calling `submitForm()` marks all fields touched, checks form validity, focuses the first invalid control via `focusBoundControl()` if invalid, and automatically resets the form upon receiving a `200 OK` response.
 - **Direct Business Logic Unit Testing**: Because the store owns the form and validation rules, all validation and submission rules are unit-tested directly against `SignUpStore` in [`sign-up.store.spec.ts`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/features/sign-up/store/sign-up.store.spec.ts) without needing to mount a DOM template.
 
-### 3. Atomic UI Decomposition & 3-Tier Error Resolution Utility
+### 3. Extending the Sign-Up Form with Additional Questions
+
+To support adding future marketing or customer profile questions without modifying page or form templates, all field definitions and validation rules are centralized in [`sign-up.schema.ts`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/features/sign-up/store/sign-up.schema.ts):
+1. Add the new property key (for example, `companyName` or `phoneNumber`) to `SignUpFormModel` and `INITIAL_SIGN_UP_MODEL` (plus `SignUpPayload` in [`sign-up.models.ts`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/core/api/sign-up.models.ts)).
+2. Append a new `FieldConfig` entry to `SIGN_UP_FIELD_CONFIGS`—for example, a telephone question with `key: 'phoneNumber'`, `id: 'sign-up-phone'`, `label: 'Phone number'`, `type: 'tel'`, `autocomplete: 'tel'`, `placeholder: 'e.g. +44 7700 900077'`, `required: false`, and `helperText: 'Optional — for SMS service alerts.'`.
+3. Register any validation rules on `path.phoneNumber` inside `signUpValidationSchema`. [`SignUpFormComponent`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/features/sign-up/components/sign-up-form/sign-up-form.component.ts) automatically renders the new `<app-text-input>` via its `@for (fieldConfig of fields(); track fieldConfig.key)` loop, and `focusFirstInvalidField()` automatically includes it in keyboard focus order.
+
+### 4. Atomic UI Decomposition & 3-Tier Error Resolution Utility
 
 The `@shared/ui` layer is decomposed into focused, single-responsibility primitives:
 - [`<app-text-input>`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/shared/ui/text-input/text-input.component.ts): Signal Forms custom control (`FormValueControl<string>`) encapsulating the `<input>`, `aria-invalid`, `aria-required`, `aria-describedby`, and programmatic `focus()` delegation.
@@ -134,22 +141,28 @@ The `@shared/ui` layer is decomposed into focused, single-responsibility primiti
   2. Field-level custom message overrides (`FieldConfig.errorMessages[kind]`).
   3. Shared Design System default fallback messages by error `kind` (`required`, `email`, `minLength`, `maxLength`, `pattern`).
 
-### 4. GDPR & Marketing Data-Privacy Transparency
+### 5. GDPR & Marketing Data-Privacy Transparency
 
 Because the sign-up form collects personal contact details (`firstName`, `lastName`, `email`) to share marketing content and product updates, [`sign-up-form.component.html`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/features/sign-up/components/sign-up-form/sign-up-form.component.html) includes an explicit GDPR transparency notice directly above the submit action informing users how their data will be used and that they can unsubscribe at any time.
 
-### 5. Configurable `MOCK_API_CONFIG` Token for Unit & Playwright E2E Testing
+### 6. Configurable `MOCK_API_CONFIG` Token for Unit & Playwright E2E Testing
 
 [`mockApiInterceptor`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/app/core/api/mock-api.interceptor.ts) is controlled via the `MOCK_API_CONFIG` `InjectionToken` (`{ enabled: boolean; delayMs: number }`):
 - **Default Development / Production Demo**: Enabled by default (`enabled: true`, `delayMs: 600`), returning a simulated `200 OK` response without requiring a backend process.
 - **Unit & Integration Tests**: Tests can override `MOCK_API_CONFIG` with `{ enabled: true, delayMs: 0 }` for instant responses or `{ enabled: false, delayMs: 0 }` to let requests pass through to Angular's `HttpTestingController`.
 - **Playwright E2E Network Interception**: When `window.__DISABLE_MOCK_API__ = true` (via `page.addInitScript`) or `?disableMockApi` is present in the URL, `MOCK_API_CONFIG` automatically sets `enabled: false`. This allows [`e2e/signup.spec.ts`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/e2e/signup.spec.ts) to intercept real browser `POST /api/signup` network requests using Playwright's `page.route()`, assert on the outgoing JSON payload, and test both `200 OK` and `500 Internal Server Error` responses.
 
-### 6. Tailwind CSS v4 Semantic Token Proxying & Category-Prefixed Naming
+### 7. Tailwind CSS v4 Semantic Token Proxying & Category-Prefixed Naming
 
 In [`src/styles.css`](file:///Users/tomwhite/Development/MyProjects/tom-white-uie-signup-form/src/styles.css), the `@theme` block proxies Tailwind v4's built-in palette CSS variables (e.g., `var(--color-sky-700)`, `var(--color-slate-900)`, `var(--color-rose-600)`) into semantic design tokens (`--color-brand-primary`, `--color-text-heading`, `--color-border-default`, `--color-status-error`).
 
 Tokens are intentionally prefixed by their semantic category (`text-*`, `surface-*`, `border-*`, `status-*`). This produces utility classes such as `text-text-heading`, `border-border-default`, and `bg-surface-card`. While slightly verbose, this naming is deliberate: it makes cross-category token misuse (such as applying a text token to a border, like `border-text-heading`, or a surface token to text) immediately visible during code review.
+
+## Future Considerations
+
+- **Web Server XSS & Security Headers**: While Angular sanitizes template interpolations by default, production deployment would enforce a strict `Content-Security-Policy` (CSP), `X-Content-Type-Options: nosniff`, and `Strict-Transport-Security` at the web server / edge layer to mitigate cross-site scripting (XSS) and injection vectors.
+- **Server-Side Rendering (SSR)**: Enable `@angular/ssr` with incremental hydration to improve First Contentful Paint (FCP), Largest Contentful Paint (LCP), and SEO indexability for public-facing landing pages.
+- **Contract-Driven API Integration (OpenAPI / Zod)**: When replacing the mock endpoint with a live backend, request/response types and client services would be auto-generated from an **OpenAPI** specification. If the backend cannot auto-generate an OpenAPI spec, runtime boundary validation would be enforced using **Zod** schemas at the HTTP service boundary to guarantee type safety against unexpected payload changes.
 
 ## Development & Build Commands
 
