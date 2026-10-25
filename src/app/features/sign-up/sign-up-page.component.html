@@ -1,0 +1,26 @@
+<section class="mx-auto w-full max-w-md py-8 sm:py-12">
+  <div class="ds-card flex flex-col gap-6">
+    @if (store.isSuccess()) {
+      <app-sign-up-success
+        [message]="store.successMessage()"
+        [submittedData]="store.submittedData()"
+        (resetClicked)="store.reset()"
+      />
+    } @else {
+      <div class="flex flex-col gap-2">
+        <h1>Stay connected</h1>
+        <p class="text-sm">
+          Sign up to receive product updates, insights, and announcements tailored to you.
+        </p>
+      </div>
+
+      <app-sign-up-form
+        [signUpForm]="store.signUpForm"
+        [fields]="store.fields"
+        [isSubmitting]="store.isSubmitting()"
+        [serverError]="store.errorMessage()"
+        (submitted)="store.submitForm()"
+      />
+    }
+  </div>
+</section>

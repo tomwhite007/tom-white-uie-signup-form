@@ -26,7 +26,7 @@
 
 @layer base {
   body {
-    @apply bg-surface-page text-text-body antialiased;
+    @apply bg-surface-card sm:bg-surface-page text-text-body antialiased;
     font-family:
       'Inter',
       -apple-system,
@@ -69,7 +69,7 @@
 
 @layer components {
   .ds-card {
-    @apply bg-surface-card border-border-default rounded-xl border p-6 shadow-sm sm:p-8;
+    @apply bg-surface-card sm:border-border-default py-2 sm:rounded-xl sm:border sm:p-8 sm:shadow-sm;
   }
 
   .ds-focus-ring {

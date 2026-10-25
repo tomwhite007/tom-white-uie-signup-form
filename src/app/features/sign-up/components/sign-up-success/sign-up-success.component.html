@@ -1,0 +1,51 @@
+<div
+  role="status"
+  aria-live="polite"
+  class="flex flex-col items-center gap-4 text-center"
+>
+  <div
+    class="bg-status-success-bg text-status-success flex h-12 w-12 items-center justify-center rounded-full"
+    aria-hidden="true"
+  >
+    <svg
+      class="h-6 w-6"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+        clip-rule="evenodd"
+      />
+    </svg>
+  </div>
+
+  <div class="flex flex-col items-center gap-2">
+    <h1>Registration complete</h1>
+    @if (message(); as msg) {
+      <p class="text-sm">
+        {{ msg }}
+      </p>
+    }
+    @if (submittedData(); as submitted) {
+      <p class="text-text-muted text-xs">
+        Registered for
+        <strong class="text-text-heading font-medium">
+          {{ submitted.firstName }} {{ submitted.lastName }}
+        </strong>
+        ({{ submitted.email }}).
+      </p>
+    }
+  </div>
+
+  <div class="w-full pt-2">
+    <app-button
+      type="button"
+      variant="secondary"
+      [fullWidth]="true"
+      (click)="onReset()"
+    >
+      Register another person
+    </app-button>
+  </div>
+</div>

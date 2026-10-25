@@ -1,6 +1,7 @@
 import {
   SchemaPath,
   email,
+  emailError,
   minLengthError,
   required,
   requiredError,
@@ -93,12 +94,23 @@ export const signUpValidationSchema = schema<SignUpFormModel>((path) => {
   applyTrimmedNameRules(path.lastName, 'Last name');
 
   required(path.email, { message: 'Email address is required.' });
+  email(path.email, { message: 'Please enter a valid email address.' });
   validate(path.email, ({ value }) => {
     const raw = value();
-    if (raw && raw.trim().length === 0) {
+    if (!raw) {
+      return undefined;
+    }
+
+    const trimmed = raw.trim();
+    if (trimmed.length === 0) {
       return requiredError({ message: 'Email address is required.' });
     }
+
+    // Ensure a valid domain with a top-level domain dot (rejects e.g. "fff@fff")
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmed)) {
+      return emailError({ message: 'Please enter a valid email address.' });
+    }
+
     return undefined;
   });
-  email(path.email, { message: 'Please enter a valid email address.' });
 });

@@ -1,0 +1,45 @@
+<form
+  novalidate
+  (submit)="onSubmit($event)"
+  class="flex flex-col gap-5"
+>
+  @if (serverError(); as error) {
+    <div
+      role="alert"
+      aria-live="assertive"
+      class="bg-status-error-bg border-border-error text-status-error rounded-lg border p-4 text-sm font-medium"
+    >
+      {{ error }}
+    </div>
+  }
+
+  @for (fieldConfig of fields(); track fieldConfig.key) {
+    <app-text-input
+      [id]="fieldConfig.id"
+      [label]="fieldConfig.label"
+      [type]="fieldConfig.type"
+      [autocomplete]="fieldConfig.autocomplete"
+      [placeholder]="fieldConfig.placeholder"
+      [helperText]="fieldConfig.helperText ?? null"
+      [errorMessages]="fieldConfig.errorMessages"
+      [formField]="getField(fieldConfig.key)"
+    />
+  }
+
+  <p class="text-text-muted text-xs leading-relaxed">
+    By submitting this form, you agree that we may use your contact details to share
+    marketing content and updates about our product offerings. You can unsubscribe at
+    any time.
+  </p>
+
+  <div class="pt-1">
+    <app-button
+      type="submit"
+      variant="primary"
+      [fullWidth]="true"
+      [loading]="isSubmitting()"
+    >
+      {{ isSubmitting() ? 'Submitting...' : 'Sign up for updates' }}
+    </app-button>
+  </div>
+</form>

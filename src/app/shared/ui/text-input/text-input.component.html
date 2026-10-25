@@ -1,0 +1,28 @@
+<app-form-field
+  [id]="id()"
+  [label]="label()"
+  [required]="required()"
+  [helperText]="helperText()"
+  [errorMessage]="resolvedError()"
+>
+  <input
+    #inputEl
+    class="ds-input ds-focus-ring"
+    [id]="id()"
+    [name]="name()"
+    [type]="type()"
+    [value]="value()"
+    [disabled]="disabled()"
+    [required]="required()"
+    [autocomplete]="autocomplete()"
+    [placeholder]="placeholder()"
+    (input)="onInput($event)"
+    (blur)="onBlur()"
+    [attr.aria-required]="required() ? 'true' : null"
+    [attr.aria-invalid]="isInvalid() ? 'true' : null"
+    [attr.aria-describedby]="ariaDescribedBy()"
+    [attr.autocorrect]="type() === 'email' ? 'off' : null"
+    [attr.autocapitalize]="type() === 'email' ? 'off' : null"
+    [attr.spellcheck]="type() === 'email' ? 'false' : null"
+  />
+</app-form-field>
